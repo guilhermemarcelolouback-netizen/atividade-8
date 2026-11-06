@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Loja Aurora</title>
+
+    <style>
+
+       
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+            color: #15132b;
+        }
+
+     
+        header {
+            background: #17006b;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #e2d5f1;
+        }
+
+        header h1 {
+            color: #000000;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+       
+        main {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #050407;
+            font-size: 38px;
+            margin-bottom: 20px;
+        }
+
+        .descricao {
+            font-size: 22px;
+            margin-bottom: 40px;
+        }
+
+        .consulta {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        input {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid #000000;
+            border-radius: 15px;
+            font-size: 20px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #030203;
+        }
+
+       
+        button {
+            padding: 18px 35px;
+            background: #0a0649;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #200970;
+        }
+
+        /* Mensagem */
+        #mensagem {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #0e0955;
+        }
+
+        /* Resultado */
+        #resultado {
+            display: none;
+            background: #f6f4f9;
+            border: 1px solid #e3dcef;
+            border-radius: 18px;
+            padding: 30px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        #resultado h3 {
+            color: #170663;
+            font-size: 25px;
+            margin-bottom: 20px;
+        }
+
+        #resultado p {
+            font-size: 19px;
+            margin: 12px 0;
+        }
+
+    
+
+    </style>
+
+</head>
+
+<body>
+
+
+    <header>
+        <h1>Loja Aurora</h1>
+    </header>
+
+  
+    <main>
+
+        <h2> Consultar CEP</h2>
+
+        <p class="descricao">
+            Digite seu CEP abaixo e descubra seu endereço:
+        </p>
+
+     
+        <div class="consulta">
+
+            <input
+                type="text"
+                id="cep"
+                placeholder="Ex: 01001000"
+                maxlength="9"
+            >
+
+            <button id="consultar">
+                Consultar
+            </button>
+
+        </div>
+
+     
+        <p id="mensagem"></p>
+
+        <section id="resultado">
+
+            <h3>Endereço encontrado:</h3>
+
+            <p>
+                <strong>Logradouro:</strong>
+                <span id="rua"></span>
+            </p>
+
+            <p>
+                <strong>Bairro:</strong>
+                <span id="bairro"></span>
+            </p>
+
+            <p>
+                <strong>Cidade:</strong>
+                <span id="cidade"></span>
+            </p>
+
+            <p>
+                <strong>UF:</strong>
+                <span id="uf"></span>
+            </p>
+
+        </section>
+
+    </main>
+
+    <script>
+
+   
+        const botao = document.getElementById("consultar");
+
+      
+        botao.addEventListener("click", consultarCEP);
+
+       
+        document.getElementById("cep").addEventListener("keydown", function(event) {
+
+            if (event.key === "Enter") {
+                consultarCEP();
+            }
+
+        });
+
+       
+        async function consultarCEP() {
+
+            const campoCEP = document.getElementById("cep");
+
+            const cep = campoCEP.value.replace(/\D/g, "");
+
+            const mensagem = document.getElementById("mensagem");
+
+            const resultado = document.getElementById("resultado");
+
+         
+            if (cep.length !== 8) {
+
+                mensagem.textContent =
+                    "Digite um CEP válido com 8 números!";
+
+                resultado.style.display = "none";
+
+                return;
+            }
+
+            mensagem.textContent = "Consultando...";
+
+            resultado.style.display = "none";
+
+            try {
+
+                
+                const resposta = await fetch(
+                    `https://viacep.com.br/ws/${cep}/json/`
+                );
+
+                const dados = await resposta.json();
+
+             
+                if (dados.erro) {
+
+                    mensagem.textContent = "CEP não encontrado!";
+
+                    return;
+                }
+
+                
+                document.getElementById("rua").textContent =
+                    dados.logradouro || "Não informado";
+
+                document.getElementById("bairro").textContent =
+                    dados.bairro || "Não informado";
+
+                document.getElementById("cidade").textContent =
+                    dados.localidade || "Não informado";
+
+                document.getElementById("uf").textContent =
+                    dados.uf || "Não informado";
+
+                mensagem.textContent =
+                    "Endereço encontrado com sucesso!";
+
+                resultado.style.display = "block";
+
+            } catch (erro) {
+
+                mensagem.textContent =
+                    "Erro ao consultar. Verifique sua conexão com a internet.";
+
+                resultado.style.display = "none";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+</html>
